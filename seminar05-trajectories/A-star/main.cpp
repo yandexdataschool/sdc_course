@@ -10,10 +10,12 @@
 #include <chrono>
 #include <set>
 #include <thread>
+#include <mutex>
 
 using namespace std;
 
 Visualizer v;
+mutex mtx;
 
 const int W = 1000;
 const int H = 500;
@@ -36,9 +38,15 @@ struct State {
     }
 };
 
-vector<Obstacle> obstacles;
-State start, finish, currentState;
-set<State> states, processedStates;
+
+struct Context {
+    vector<Obstacle> obstacles;
+    State start, finish, currentState;
+    set<State> states, processedStates;
+};
+
+Context ctx;
+bool mapReset;
 
 bool operator<(const State& a, const State& b) {
     const double diff = a.f + a.h - (b.f + b.h);
@@ -57,6 +65,8 @@ double dist(double l, double r, double h, double x, double y) {
 }
 
 bool intersect(const Obstacle& o, const State& st) {
+    if (o.xmin <= st.x && st.x <= o.xmax && o.ymin <= st.y && st.y <= o.ymax)
+        return true;
     return dist(o.xmin, o.xmax, o.ymin, st.x, st.y) < carR ||
            dist(o.xmin, o.xmax, o.ymax, st.x, st.y) < carR ||
            dist(o.ymin, o.ymax, o.xmin, st.y, st.x) < carR ||
@@ -64,7 +74,7 @@ bool intersect(const Obstacle& o, const State& st) {
 }
 
 bool goodState(const State& st) {
-    for (const auto& o : obstacles)
+    for (const auto& o : ctx.obstacles)
         if (intersect(o, st))
             return false;
 
@@ -91,7 +101,7 @@ vector<State> possibleMoves(const State& st, const double step, const double yaw
 }
 
 double h(const State& st) {
-    return dist(st.x, st.y, finish.x, finish.y);
+    return dist(st.x, st.y, ctx.finish.x, ctx.finish.y);
 }
 
 State genState() {
@@ -104,32 +114,44 @@ State genState() {
 }
 
 void findPath() {
-    start = genState();
-    finish = genState();
+    mtx.lock();
+    ctx.start = genState();
+    ctx.finish = genState();
 
-    states.clear();
-    processedStates.clear();
+    ctx.states.clear();
+    ctx.processedStates.clear();
 
-    states.insert(start);
+    ctx.states.insert(ctx.start);
+    mtx.unlock();
+
     set<Key> seen;
 
     const double step = 8;
     const double yaw_step = 0.42;
 
-    while (!states.empty()) {
-        currentState = *states.begin();
-        states.erase(states.begin());
-        processedStates.insert(currentState);
-
-        if (dist(currentState.x, currentState.y, finish.x, finish.y) < 5) {
+    while (!ctx.states.empty()) {
+        if (mapReset) {
+            mapReset = false;
             break;
         }
 
-        for (auto nextState : possibleMoves(currentState, step, yaw_step))
+        mtx.lock();
+        ctx.currentState = *ctx.states.begin();
+        ctx.states.erase(ctx.states.begin());
+        ctx.processedStates.insert(ctx.currentState);
+        mtx.unlock();
+
+        if (dist(ctx.currentState.x, ctx.currentState.y, ctx.finish.x, ctx.finish.y) < 5) {
+            break;
+        }
+
+        for (auto nextState : possibleMoves(ctx.currentState, step, yaw_step))
             if (seen.insert(nextState.getKey()).second) {
-                 nextState.f = currentState.f + step;
+                 nextState.f = ctx.currentState.f + step;
                  nextState.h = h(nextState);
-                 states.insert(nextState);
+                 mtx.lock();
+                 ctx.states.insert(nextState);
+                 mtx.unlock();
             }
 
         this_thread::sleep_for(chrono::milliseconds(5));
@@ -144,7 +166,7 @@ void solve() {
 
 void genMap() {
     size_t n = rand() % 20 + 2;
-    obstacles.clear();
+    ctx.obstacles.clear();
 
     for (size_t i = 0; i < n; i++) {
         while (true) {
@@ -161,13 +183,13 @@ void genMap() {
             if (ymax - ymin < 10) continue;
 
             if (xmax - xmin < W / 10 || ymax - ymin < H / 10) {
-                obstacles.push_back(Obstacle{xmin, ymin, xmax, ymax});
+                ctx.obstacles.push_back(Obstacle{xmin, ymin, xmax, ymax});
                 break;
             }
         }
     }
 
-    assert(obstacles.size() == n);
+    assert(ctx.obstacles.size() == n);
 }
 
 void drawState(const State& st, const double R) {
@@ -181,44 +203,49 @@ int main(int argc, char **argv) {
 
     v.setSize(W, H);
     genMap();
-
-    // v.setOnMouseClick([&](double x, double y) {
-    //     points.emplace_back(x, y);
-    // });
+    mapReset = false;
 
     v.setOnKeyPress([&](const QKeyEvent& ev) {
         if (ev.key() == Qt::Key_M) {
+            mapReset = true;
+            mtx.lock();
             genMap();
+            mtx.unlock();
         }
     });
 
     thread solveThread(solve);
 
+    Context ctx_copy;
     while (true) {
         RenderCycle r(v);
 
+        mtx.lock();
+        ctx_copy = ctx;
+        mtx.unlock();
+
         v.p.setBrush(blackBrush);
-        for (const auto& o : obstacles) {
+        for (const auto& o : ctx_copy.obstacles) {
             v.p.drawRect(o.xmin, o.ymin, o.xmax - o.xmin, o.ymax - o.ymin);
         }
 
         v.p.setPen(blackPen);
-        for (const auto& s : processedStates) {
+        for (const auto& s : ctx_copy.processedStates) {
             drawState(s, 2);
         }
 
         v.p.setPen(redPen);
-        for (const auto& s : states) {
+        for (const auto& s : ctx_copy.states) {
             drawState(s, 2);
         }
 
         v.p.setPen(bluePen);
-        drawState(currentState, 2);
+        drawState(ctx_copy.currentState, 2);
 
         v.p.setPen(greenPen);
-        drawState(start, 10);
+        drawState(ctx_copy.start, 10);
 
         v.p.setPen(yellowPen);
-        drawState(finish, 10);
+        drawState(ctx_copy.finish, 10);
     }
 }

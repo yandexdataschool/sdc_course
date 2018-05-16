@@ -8,11 +8,13 @@
 #include <algorithm>
 #include <chrono>
 #include <thread>
+#include <mutex>
 
 using namespace std;
 
 World world;
 double a, df;
+mutex mtx;
 
 pair<int, double> pedestriansInFront() {
     // 0 - no peds
@@ -58,6 +60,7 @@ pair<int, double> pedestriansInFront() {
 
 void solve() {
     while (true) {
+        mtx.lock();
         world.updatePedestrians();
 
         double desiredSpeed = 200.0;
@@ -81,6 +84,8 @@ void solve() {
             cerr << world.getTimeSinceStart() << " sec.\n";
             break;
         }
+        mtx.unlock();
+
         this_thread::sleep_for(chrono::milliseconds(10));
     }
 }
@@ -102,9 +107,15 @@ int main(int argc, char **argv) {
     world.init();
     thread solveThread(solve);
 
+    World world_copy;
     while (true) {
         RenderCycle r(v);
 
-        world.draw();
+        {
+            mtx.lock();
+            world_copy = world;
+            mtx.unlock();
+        }
+        world_copy.draw();
     }
 }
