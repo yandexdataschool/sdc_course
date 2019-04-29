@@ -136,7 +136,7 @@ struct Crosswalk {
 class World {
 public:
     static constexpr int ROAD_LENGTH = 10000;
-    static constexpr int LANES_NUMBER = 2;
+    static constexpr int LANES_NUMBER = 4;
     static constexpr int LANE_WIDTH = 30;
 
     bool gameOver() const {
@@ -190,7 +190,7 @@ public:
             pedestrians.end());
 
         int magic = curTime * 3;  // :)
-        const size_t MAX_PEDESTRIANS_COUNT = 10;
+        const size_t MAX_PEDESTRIANS_COUNT = 50;
         if (magic != prevMagic && pedestrians.size() < MAX_PEDESTRIANS_COUNT) {
             prevMagic = magic;
             pedestrians.push_back(createPedestrian());
@@ -394,7 +394,6 @@ private:
 
         cx = W / 3;
         obstacles.clear();
-	/*
         while (true) {
             cx += rand() % 500 + 50;
             if (cx >= ROAD_LENGTH) break;
@@ -416,7 +415,6 @@ private:
                 }
             }
         }
-	*/
     }
 
     void drawCar(const Car& c, const double offX) {

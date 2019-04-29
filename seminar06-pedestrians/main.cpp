@@ -22,9 +22,30 @@ enum class Status {
 };
 
 pair<Status, double> pedestriansInFront() {
+    const Car ego = world.getMyCar();
     Status status = Status::NO_PEDESTRIANS;
     double distance = numeric_limits<double>::max();
-    return {status, distance};
+    double closest_crosswalk = numeric_limits<double>::max();
+    for (const auto& cw : world.getCrosswalks()) {
+        if (cw.lx > ego.x - Car::LENGTH / 2. && cw.lx < closest_crosswalk) {
+            closest_crosswalk = cw.lx;
+        }
+    }
+
+    for (const auto& p : world.getPedestrians()) {
+      if (p.y + PedestrianFearRadius < ego.y - Car::WIDTH / 2. && sin(p.yaw) < 0) {
+         continue;
+      }
+      if (p.y - PedestrianFearRadius > ego.y + Car::WIDTH / 2. && sin(p.yaw) > 0) {
+         continue;
+      }
+      if (p.x < ego.x - Car::LENGTH / 2. || p.x > closest_crosswalk + 100) {
+         continue;
+      }
+      distance = min(distance, dist(p.x, p.y, ego.x, ego.y));
+      status = Status::ON_THE_ROAD;
+    }
+    return {status, closest_crosswalk - ego.x - Car::LENGTH / 2. - 40};
 }
 
 void solve() {
@@ -32,6 +53,17 @@ void solve() {
         mtx.lock();
         world.updatePedestrians();
 
+        double a = 0;
+        auto result = pedestriansInFront();
+        a = 60;
+        const Car ego = world.getMyCar();
+        if (result.first == Status::ON_THE_ROAD) {
+            if (result.second <= 500) {
+                a = min(-ego.v * ego.v / result.second / 2., -1.);
+            }
+        }
+
+        double df = 0;
         world.makeStep(a, df);
 
         if (world.checkCollisions()) {
