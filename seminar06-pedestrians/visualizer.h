@@ -122,7 +122,7 @@ public:
     Visualizer() : pixmapItem(nullptr), height_(0), width_(0) {
         static char arg0[] = "Visualizer";
         static char* argv[] = { &arg0[0], NULL };
-        int argc = (int)(sizeof(argv) / sizeof(argv[0])) - 1;
+        static int argc = (int)(sizeof(argv) / sizeof(argv[0])) - 1;
         app = new QApplication(argc, argv);
         scene = new QGraphicsScene();
         view = new CustomView(scene);
