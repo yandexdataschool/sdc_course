@@ -30,7 +30,7 @@ def test_graph_optimization_without_landmarks():
     # Disturb vertex positions to see prior effect
     all_params = optimization._all_params
     if all_params is not None:
-        all_params[::3] += 1000.5
+        all_params[::3] += 0.5
         all_params[1::3] += 0.5
         optimization._all_params = all_params
 
