@@ -5,12 +5,12 @@ from .movement_model_base import MovementModelBase
 
 
 class CycloidMovementModel(MovementModelBase):
-    """Реализует движение автомобиля по циклоиде"""
+    """ Implements movement model with cycloid trajectory"""
     def __init__(self, x_vel=0, y_vel=0, omega=0, *args, **kwargs):
         """
-        :param x_vel: Скорость движения центра вращения вдоль оси X
-        :param y_vel: Скорость двжиения центра вращения вдоль оси Y
-        :param omega: Угловая скорость (рад/с) при движении по циклоиде
+        :param x_vel: velocity of cycloid center along x-axis
+        :param y_vel: velocity of cycloid center along y-axis
+        :param omega: angular velocity, radians per second
         """
         super(CycloidMovementModel, self).__init__(*args, **kwargs)
         self.x_vel = x_vel
@@ -35,7 +35,7 @@ class CycloidMovementModel(MovementModelBase):
         new_vel_x = vel_x - self.omega * (vel_y - self.y_vel) * dt_sec
         new_vel_y = vel_y + self.omega * (vel_x - self.x_vel) * dt_sec
 
-        # Продвигаем время, выставляем новое состояние
+        # shift car time on dt and set the new state of car
         car.time += dt
         car._position_x = new_x
         car._position_y = new_y

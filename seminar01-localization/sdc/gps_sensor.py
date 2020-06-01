@@ -4,7 +4,7 @@ from .car_sensor_base import CarSensorBase
 
 
 class GpsSensor(CarSensorBase):
-    """GPS-датчик. Измеряет глобальное положение автомобиля."""
+    """GPS sensor. Measures global position of the car"""
     def __init__(self, *args, **kwargs):
         super(GpsSensor, self).__init__(*args, **kwargs)
 

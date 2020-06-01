@@ -9,14 +9,15 @@ from .imu_sensor import ImuSensor
 
 
 class Car(object):
-    """Простая модель автомобиля в двухмерном мире.
-    В качестве истинных переменных состояния выступают положение, скорости и ориентация относительно оси oX:
-    (pos_x, pos_y, vel, yaw)
-    Также автомобиль поддерживает значение текущего глобального времени.
+    """
+    Simple model of car in 2d world.
 
-    Истинное состояние автомобиля неизвестно внешнему наблюдателю, однако у автомобиля есть набор сенсоров,
-    у которых можно спрашивать текущие значения скоростей и глобальных координат. Сенсоры выдают данные
-    с некоторым шумом.
+    Hidden variables of the model are position, velocity and orientation around oX axis.
+    (pos_x, pos_y, vel, yaw).
+    It also contains the current timestamp for which the hidden state is valid.
+
+    Ground truth state of the car is unknown to external user. Car has a set of sensors
+    which provide data with some noise.
     """
 
     POS_X_INDEX = 0
@@ -59,7 +60,7 @@ class Car(object):
         else:
             self.initial_omega = float(initial_omega)
 
-        # Инициализация состояния автомобиля
+        # initialization of the car state
         self._state = np.zeros(5)
         self._position_x = self.initial_position[0]
         self._position_y = self.initial_position[1]
@@ -70,15 +71,15 @@ class Car(object):
         self._time = Timestamp()
         assert self._time.nsec == 0 and self._time.sec == 0
 
-        # У автомобиля есть некоторая траектория, задаваемая моделью движения
+        # car trajectory is defined by some movement model
         self.set_movement_model(movement_model)
-        # У автомобиля есть некоторый набор сенсоров (датичков)
+        # car sensors initialization
         self._sensors = []
-        self._can_sensor = None  # Одометрия
-        self._gps_sensor = None  # GPS
-        self._imu_sensor = None  # IMU (гироскоп)
+        self._can_sensor = None  # odometry
+        self._gps_sensor = None
+        self._imu_sensor = None
 
-        # История состояний
+        # car states history
         self._positions_x = []
         self._positions_y = []
         self._velocities_x = []
@@ -98,10 +99,8 @@ class Car(object):
         if movement_model is None:
             movement_model = MovementModelBase()
         assert isinstance(movement_model, MovementModelBase)
-        # Привязываем модель движения к автомобилю
-        self._movement_model = movement_model
-        # Привязываем автомобиль к модели движения
-        movement_model._initialize(self)
+        self._movement_model = movement_model  # assign movement model to car
+        movement_model._initialize(self)  # assign car to movement model
 
     def add_sensor(self, sensor):
         assert isinstance(sensor, CarSensorBase)
@@ -119,7 +118,7 @@ class Car(object):
     def move(self, dt):
         assert isinstance(dt, Timestamp)
         self._movement_model._move(dt)
-        # Храним историю состояний
+        # update car state history
         self._positions_x.append(self._position_x)
         self._positions_y.append(self._position_y)
         self._yaws.append(self._yaw)
@@ -129,7 +128,7 @@ class Car(object):
         self._omegas.append(self._omega)
 
     ######################################################################
-    #  Доступ к компонентам автомобиля - модели движения и сенсорам      #
+    #  Access to car components - movement model and sensors             #
     ######################################################################
     @property
     def movement_model(self):
@@ -152,7 +151,7 @@ class Car(object):
         return self._imu_sensor
 
     ######################################################################
-    # Доступ к переменным состояния модели (на самом деле скрыты от нас) #
+    # Access to hidden state                                             #
     ######################################################################
     @property
     def _state_size(self):

@@ -4,14 +4,14 @@ from .timestamp import Timestamp
 
 
 class KalmanMovementModel(object):
-    """Модель эволюции в калмановской локализации.
-    Продвигает автомобиль вперед с его текущей скоростью"""
+    """
+    Kalman model of car movement. Predicts future car state according to the current car state.
+    """
     def __init__(self, noise_covariance_density=None):
         """
         :type noise_covariance_density: np.ndarray или None
-        :param noise_covariance_density: плотность матрицы ковариации.
-            Элементами этой матрицы являются скорости нарастания ковариации между элементами в секунду.
-            Если матрица плотности ковариции не задана, то полагается нулевой.
+        :param noise_covariance_density: matrix, whose elements represent groth rates of
+            covariance matrix elements per second (default: zero-matrix)
         """
         self._car_model = None
         self._noise_covariance_density = noise_covariance_density
@@ -21,8 +21,9 @@ class KalmanMovementModel(object):
         return self._car_model._state_size
 
     def _initialize(self, car_model):
-        """Вызывается при добавлении модели движения к автомобилю.
-        Привязывает модель к конкретному автомобилю.
+        """
+        Method is called when the movement model is added to a car.
+        Ties model instance and car instance.
         """
         self._car_model = car_model
         state_size = car_model._state_size
@@ -33,7 +34,7 @@ class KalmanMovementModel(object):
             assert self._noise_covariance_density.shape == (state_size, state_size)
 
     def get_next_state(self, dt):
-        """Возвращает состояние в следующий момент времени."""
+        """Predicts car state after 'dt' seconds"""
         assert isinstance(dt, Timestamp)
         car = self._car_model
         state_size = car.state_size
@@ -55,8 +56,10 @@ class KalmanMovementModel(object):
         return new_state
 
     def get_state_jacobian_matrix(self, dt):
-        """Возвращает матрицу матрицу Якоби car.time. В случае линейной системе матрица Якоби представляет
-        собой матрицу перехода A для текущего момента времени car.time."""
+        """
+        Returns Jacobian matrix. In case of linear movement Jacobian matrix is transition
+        matrix A.
+        """
         assert isinstance(dt, Timestamp)
         car = self._car_model
         state_size = car._state_size
@@ -75,10 +78,10 @@ class KalmanMovementModel(object):
         return J
 
     def get_noise_covariance(self, dt):
-        """Возвращает матрицу ковариации шума для текущего момента времени car.time"""
+        """Returns noise covariance matrix for timestamp 'car.time+dt'"""
         assert isinstance(dt, Timestamp)
         return self._noise_covariance_density * float(dt.to_seconds())
 
     def get_noise_covariance_density(self):
-        """Возвращает матрицу плотности ковариации шума для текущего момента времени car.time"""
+        """Returns noise covariance density for current timestamp (car.time)"""
         return self._noise_covariance_density

@@ -4,7 +4,7 @@ from .kalman_sensor_base import KalmanSensorBase
 
 
 class KalmanGpsSensor(KalmanSensorBase):
-    """Калмановский эквивалент GPS-датчика."""
+    """Simple kalman model of gps sensor"""
     def __init__(self, *args, **kwargs):
         super(KalmanGpsSensor, self).__init__(*args, **kwargs)
 

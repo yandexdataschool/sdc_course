@@ -40,7 +40,7 @@ class Timestamp(object):
         return Timestamp.nanoseconds(nsec)
 
     #########################################
-    #      Assignments operators            #
+    #      Comparisson operators            #
     #########################################
     def __le__(self, rhs):
         if self.sec <= rhs.sec:
@@ -66,7 +66,7 @@ class Timestamp(object):
         return self.sec == rhs.sec and self.nsec == rhs.nsec
 
     #########################################
-    #      Арифметрические операторы        #
+    #      Arithmetic operators             #
     #########################################
     def __add__(self, rhs):
         """a + b"""
@@ -84,7 +84,7 @@ class Timestamp(object):
         return self
 
     #########################################
-    #      Свойства                         #
+    #      Properties                       #
     #########################################
     @property
     def sec(self):

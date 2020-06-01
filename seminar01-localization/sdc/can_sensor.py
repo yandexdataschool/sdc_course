@@ -4,7 +4,7 @@ from .car_sensor_base import CarSensorBase
 
 
 class CanSensor(CarSensorBase):
-    """Датчик одометрии. Измеряет линейную скорость автомобиля."""
+    """Sensor that reports linear velocity of the car."""
     def __init__(self, *args, **kwargs):
         super(CanSensor, self).__init__(*args, **kwargs)
 

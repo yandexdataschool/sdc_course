@@ -4,5 +4,7 @@ from .car_sensor_base import CarSensorBase
 
 
 class ImuSensor(CarSensorBase):
-    """IMU-датчик. Измеряет угловую скорость автомобиля"""
+    """IMU sensor (gyroscope). Measures angular velocity"""
+    # TODO implement it. See can_sensor.py for reference
     pass
+

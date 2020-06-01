@@ -4,5 +4,6 @@ from .kalman_sensor_base import KalmanSensorBase
 
 
 class KalmanImuSensor(KalmanSensorBase):
-    """Калмановский IMU-датчик."""
+    """Simple kalman model of imu sensor"""
+    # TODO implement it, see kalman_can_sensor.py for reference
     pass

@@ -8,7 +8,10 @@ def kalman_transit_covariance(S, A, R):
     :param A: Either transition matrix or jacobian matrix
     :param R: Current noise covariance matrix
     """
+    # TODO implement it
+    assert False, "Not implemented"
     new_S = None
+    # new_s = ...
     return new_S
 
 
@@ -21,6 +24,11 @@ def kalman_process_observation(mu, S, observation, C, Q):
     :param C: Observation matrix
     :param Q: Noise covariance matrix (with zero mean)
     """
+    # TODO implement it
+    assert False, "Not implemented"
     new_mu = None
     new_S = None
+
+    # new_mu = ...
+    # new_S = ...
     return new_mu, new_S

@@ -29,7 +29,7 @@ class KalmanCar(Car):
         state = np.array(state, copy=False)
         assert state.shape == (self.state_size,)
         self._state = state
-        # Храним историю состояний
+        # update car state history
         self._positions_x.append(self._position_x)
         self._positions_y.append(self._position_y)
         self._yaws.append(self._yaw)
@@ -64,14 +64,12 @@ class KalmanCar(Car):
         if movement_model is None:
             movement_model = KalmanMovementModel()
         assert isinstance(movement_model, KalmanMovementModel)
-        # Привязываем модель движения к автомобилю
-        self._movement_model = movement_model
-        # Привязываем автомобиль к модели движения
-        movement_model._initialize(self)
+        self._movement_model = movement_model  # assigning movement model to car
+        movement_model._initialize(self)  # assiging car to movement model instance
 
     def move(self, dt):
         assert isinstance(dt, Timestamp)
-        # Делаем предсказание на момент времени t + dt
+        # predicting state at timestamp = t + dt
         new_mu = self.movement_model.get_next_state(dt)
 
         J = self.movement_model.get_state_jacobian_matrix(dt)
@@ -82,7 +80,7 @@ class KalmanCar(Car):
         self.state = new_mu
         self.covariance_matrix = new_S
 
-        # Храним историю состояний
+        # update car state history
         self._positions_x.append(self._position_x)
         self._positions_y.append(self._position_y)
         self._yaws.append(self._yaw)

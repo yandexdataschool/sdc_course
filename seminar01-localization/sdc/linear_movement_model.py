@@ -5,7 +5,7 @@ from .movement_model_base import MovementModelBase
 
 
 class LinearMovementModel(MovementModelBase):
-    """Продвигает автомобиль вперед с его текущей скоростью"""
+    """ Implements movement model with constant velocity"""
     def __init__(self, *args, **kwargs):
         super(LinearMovementModel, self).__init__(*args, **kwargs)
 
@@ -25,6 +25,7 @@ class LinearMovementModel(MovementModelBase):
         yaw = state[car.YAW_INDEX]
         vel = state[car.VEL_INDEX]
         omega = state[car.OMEGA_INDEX]
+
         new_state = np.zeros_like(state)
         new_state[car.POS_X_INDEX] = x + vel * np.cos(yaw) * dt_sec
         new_state[car.POS_Y_INDEX] = y + vel * np.sin(yaw) * dt_sec

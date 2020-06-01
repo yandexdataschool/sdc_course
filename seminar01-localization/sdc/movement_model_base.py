@@ -2,21 +2,20 @@
 
 
 class MovementModelBase(object):
-    """Отвечает за движение автомобиля. Представляет метод _move, который вызывается для продвижения
-    автомобиля далее вдоль траектории на запрошенный шаг времени dt. Модель движения имеет прямой
-    доступ к скрытому состоянию автомобиля для его корректного изменения.
+    """
+    Represents car movement.
 
-    Калмановская локализация:
-        Реализует модель эволюции.
-        Предоставляет интерфейс для получения матрицы перехода и шума в текущий момент времени.
+    One should call method _move to move car along a trajectory during time 'dt'. Class has a
+    direct access to car state and updates it after each move.
     """
 
     def __init__(self):
         self._car = None
 
     def _initialize(self, car):
-        """Вызывается при добавлении модели движения к автомобилю.
-        Привязывает модель к конкретному автомобилю.
+        """
+        Method is called when the movement model is added to a car.
+        Ties model instance and car instance.
         """
         self._car = car
 
@@ -25,7 +24,8 @@ class MovementModelBase(object):
         return self._car._state_size
 
     def _move(self,  dt):
-        """Продвигает автомобиль вдоль его траектории на время dt. Увеличивает значение времени.
-        Траектория может быть задана в явном виде, т.е. в виде уравнения движения.
+        """
+        Moves the car along its trajectory during time 'dt'. Changes car timestamp.
+        Trajectory can be represented as motion equations.
         """
         assert False
