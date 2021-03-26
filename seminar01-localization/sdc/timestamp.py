@@ -11,6 +11,8 @@ class Timestamp(object):
     MILLI_SEC_COEFF = 1000        # Number of milliseconds in one second
 
     def __init__(self, sec=0, nsec=0):
+        assert int(sec) == sec, 'sec must be an integer value'
+        assert int(nsec) == nsec, 'nsec must be an integer value'
         self.sec = sec
         self.nsec = nsec
 
