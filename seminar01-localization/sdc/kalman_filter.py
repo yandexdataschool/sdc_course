@@ -9,6 +9,7 @@ def kalman_transit_covariance(S, A, R):
     :param R: Current noise covariance matrix
     """
     new_S = None
+    assert False
     return new_S
 
 
@@ -23,4 +24,5 @@ def kalman_process_observation(mu, S, observation, C, Q):
     """
     new_mu = None
     new_S = None
+    assert False
     return new_mu, new_S
