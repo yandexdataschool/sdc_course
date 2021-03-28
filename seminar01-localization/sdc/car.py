@@ -6,6 +6,7 @@ from .car_sensor_base import CarSensorBase
 from .can_sensor import CanSensor
 from .gps_sensor import GpsSensor
 from .imu_sensor import ImuSensor
+from .sensor_landmark import LandmarkSensor
 
 
 class Car(object):
@@ -77,6 +78,7 @@ class Car(object):
         self._can_sensor = None  # Одометрия
         self._gps_sensor = None  # GPS
         self._imu_sensor = None  # IMU (гироскоп)
+        self._landmark_sensors = []  # Сенсоры наблюдения за маяками
 
         # История состояний
         self._positions_x = []
@@ -111,6 +113,8 @@ class Car(object):
             self._gps_sensor = sensor
         elif isinstance(sensor, ImuSensor):
             self._imu_sensor = sensor
+        elif isinstance(sensor, LandmarkSensor):
+            self._landmark_sensors.append(sensor)
         else:
             assert False, 'Unknown sensor type'
         self._sensors.append(sensor)
@@ -150,6 +154,10 @@ class Car(object):
     @property
     def imu_sensor(self):
         return self._imu_sensor
+
+    @property
+    def landmark_sensors(self):
+        return self._landmark_sensors
 
     ######################################################################
     # Доступ к переменным состояния модели (на самом деле скрыты от нас) #
@@ -191,6 +199,14 @@ class Car(object):
         self._state[self.VEL_INDEX] = velocity
 
     @property
+    def _linear_velocity(self):
+        return self._state[self.VEL_INDEX]
+
+    @_linear_velocity.setter
+    def _linear_velocity(self, linear_velocity):
+        self._state[self.VEL_INDEX] = linear_velocity
+
+    @property
     def _velocity_x(self):
         return self._velocity * np.cos(self._yaw)
 
@@ -205,6 +221,14 @@ class Car(object):
     @_omega.setter
     def _omega(self, omega):
         self._state[self.OMEGA_INDEX] = omega
+
+    @property
+    def _angular_velocity(self):
+        return self._state[self.OMEGA_INDEX]
+
+    @_angular_velocity.setter
+    def _angular_velocity(self, angular_velocity):
+        self._state[self.OMEGA_INDEX] = angular_velocity
 
     @property
     def time(self):
