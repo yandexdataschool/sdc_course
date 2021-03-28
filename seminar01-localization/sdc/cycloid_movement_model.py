@@ -9,7 +9,7 @@ class CycloidMovementModel(MovementModelBase):
     def __init__(self, x_vel=0, y_vel=0, omega=0, *args, **kwargs):
         """
         :param x_vel: Скорость движения центра вращения вдоль оси X
-        :param y_vel: Скорость двжиения центра вращения вдоль оси Y
+        :param y_vel: Скорость движения центра вращения вдоль оси Y
         :param omega: Угловая скорость (рад/с) при движении по циклоиде
         """
         super(CycloidMovementModel, self).__init__(*args, **kwargs)
