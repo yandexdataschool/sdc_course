@@ -17,41 +17,43 @@ double a, df;
 mutex mtx;
 bool pressed;
 
-
-double getAcceleration(
-    const vector<DetectedPedestrian>& peds,
-    const vector<Crosswalk>& crosswalks,
-    const Car& car) {
-
-    int closestX = World::ROAD_LENGTH + 1;
-
-    for (const auto& cr : crosswalks)
-        if (cr.lx > car.x && cr.lx < closestX)
-            closestX = cr.lx;
-
-    const double max_brake = 20;
-    const double t = car.v / max_brake;
-    const double s = car.v * t + (-max_brake) * t * t / 2;
-
-    if (closestX - 2 * Car::LENGTH > car.x + s) {
-        return 100;
+double getAcceleration(const Car& ego) {
+  Crosswalk nearestCrosswalk{10000, 10000};
+  const double maxDeceleration = 50;
+  const double brakingDistance = ego.v * ego.v / 2 / maxDeceleration;
+  auto crosswalks = world.getCrosswalks();
+  std::sort(std::begin(crosswalks), std::end(crosswalks),
+            [](const Crosswalk& l, const Crosswalk& r) { return l.lx < r.lx;});
+  for (const auto& cr : crosswalks) {
+    if (ego.x > cr.rx) {
+      continue;
+    }
+    if (nearestCrosswalk.lx > cr.lx) {
+      nearestCrosswalk = cr;
     }
 
-    for (const auto& p : peds) {
-        if (p.x >= closestX - 60 && p.x <= closestX + 100) {
-            if (p.y < car.y - World::LANE_WIDTH && sin(p.yaw) < 0.1)
-                continue;
-            if (p.y > car.y + World::LANE_WIDTH && sin(p.yaw) > -0.1)
-                continue;
-
-            if (car.x + Car::LENGTH / 2 + s * 0.5 > p.x)
-                continue;
-
-            return -100;
-        }
+    if (cr.lx - nearestCrosswalk.rx < brakingDistance) {
+      nearestCrosswalk.rx = cr.rx;
     }
+  }
 
-    return 100;
+
+  for (const auto& ped : world.getPedestrians()) {
+    if (ped.y + PedestrianFearRadius < ego.y && ped.yaw < 0) {
+      continue;
+    }
+    if (ped.y - PedestrianFearRadius > ego.y && ped.yaw > 0) {
+      continue;
+    }
+    if (ped.x >= nearestCrosswalk.lx - 40 && ped.x <= nearestCrosswalk.rx + 40) {
+      //const double timeToCrosswalk = (nearestCrosswalk.lx - ego.x - PedestrianFearRadius) / std::max(ego.v, 0.001);
+      if (nearestCrosswalk.lx - ego.x - 30 - PedestrianFearRadius < brakingDistance) {
+          return -100;
+      }
+    }
+  }
+
+  return 100;
 }
 
 void solve() {
@@ -60,10 +62,7 @@ void solve() {
         world.updatePedestrians();
 
         const Car ego = world.getMyCar();
-
-        // comment this line to run simulator in manual mode
-        double a = getAcceleration(world.getPedestrians(), world.getCrosswalks(), ego);
-        // double df = ...
+        a = getAcceleration(ego);
 
         world.makeStep(a, df);
 
