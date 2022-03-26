@@ -12,7 +12,7 @@ class Edge(object):
     def __init__(self, vertices):
         self.vertices = vertices
         self._J = None
-        self.inf = None
+        self._inf = None
     
     def linearize(self):
         DELTA = 1E-9
