@@ -42,15 +42,15 @@ class TestOdometry():
         FINAL_ANGLE_SHIFT = -0.112
         from_pose = (T * ts.Transform2D.from_pose([0.0, 0.0, 0.0])).to_pose()
         from_vertex = ge.SE2Vertex(from_pose)
-        to_pose = (T * ts.Transform2D.from_pose([R * np.sin(THETA), R * np.cos(THETA) - R, -THETA + FINAL_ANGLE_SHIFT])).to_pose()
+        to_pose = (T * ts.Transform2D.from_pose([R * np.sin(THETA), R - R * np.cos(THETA), THETA + FINAL_ANGLE_SHIFT])).to_pose()
         to_vertex = ge.SE2Vertex(to_pose)
         event = {'command': [10.0, 0.0], 'alpha': [0.001] * 6, 'type': 'control'}
         edge = ge.OdometryEdge(from_vertex=from_vertex, to_vertex=to_vertex, event=event)
         edge.compute_error()
         
-        # Prediction should be [2.61799, -0.261799, -0.112]
-        # Error should be [7.38201, 0.261799, -0.112]
-        assert np.linalg.norm(edge.error - np.array([7.38201, 0.261799, -0.112]), ord=np.inf) < 1E-5
+        # Prediction should be [2.61799, 0.261799, -0.112]
+        # Error should be [7.38201, -0.261799, -0.112]
+        assert np.linalg.norm(edge.error - np.array([7.38201, -0.261799, -0.112]), ord=np.inf) < 1E-5
         assert np.linalg.norm(edge.inf.flatten() - np.diag([10.0] * 3).flatten(), ord=np.inf) < 1E-5
 
 
