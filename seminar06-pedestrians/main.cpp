@@ -18,8 +18,60 @@ mutex mtx;
 bool pressed;
 
 
-double getAcceleration(const Car& /*car*/) {
+double getAcceleration(const Car& car) {
+  auto crosswalks = world.getCrosswalks();
+
+  std::sort(std::begin(crosswalks), std::end(crosswalks), [](const Crosswalk& lhs, const Crosswalk& rhs) {
+    return lhs.lx < rhs.lx;
+  });
+
+  const Crosswalk* nearestCrosswalk = nullptr;
+  for (const auto& cr : crosswalks) {
+    if (cr.lx > car.x + Car::LENGTH) {
+      nearestCrosswalk = &cr;
+      break;
+    }
+  }
+
+  if (nearestCrosswalk == nullptr) {
     return 100;
+  }
+
+  const double maxDeceleration = 100;
+  const double brakingDistance = car.v * car.v / maxDeceleration;
+
+  if (car.x + Car::LENGTH + PedestrianFearRadius < nearestCrosswalk->lx - brakingDistance) {
+    return 100;
+  }
+
+  const auto peds = world.getPedestrians();
+  for (const auto& ped : peds) {
+    const double dir_y = sin(ped.yaw) < 0 ? -1 : 1;
+    const double dir_x = cos(ped.yaw) < 0 ? -1 : 1;
+
+    const bool is_pedestrian_on_crosswalk = (
+      ped.x + PedestrianFearRadius > nearestCrosswalk->lx &&
+      ped.x - PedestrianFearRadius < nearestCrosswalk->rx);
+
+    // We introduced new error right here:
+    const double distance_to_consider = 100;
+    const bool is_moving_to_crosswalk = (
+      (ped.x > nearestCrosswalk->lx - distance_to_consider && dir_x > 0) ||
+      (ped.x < nearestCrosswalk->rx + distance_to_consider && dir_x < 0));
+
+    const bool is_on_same_lane = (
+      ped.y + PedestrianFearRadius > car.y - Car::WIDTH &&
+      ped.y - PedestrianFearRadius < car.y + Car::WIDTH);
+
+    const bool is_moving_to_our_lane = (
+      (ped.y > car.y && dir_y < 0) || (ped.y < car.y && dir_y > 0));
+
+    if ((is_pedestrian_on_crosswalk || is_moving_to_crosswalk) &&
+        (is_on_same_lane || is_moving_to_our_lane)) {
+       return -100;
+    }
+  }
+  return 100;
 }
 
 void solve() {
@@ -30,7 +82,7 @@ void solve() {
         [[maybe_unused]] const Car ego = world.getMyCar();
 
         // comment this line to run simulator in manual mode
-        //double a = getAcceleration(ego);
+        double a = getAcceleration(ego);
         // double df = ...
 
         world.makeStep(a, df);
