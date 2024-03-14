@@ -1,9 +1,9 @@
-# -*- coding: utf-8 -*-
+import abc
 import numpy as np
 from .kalman_filter import kalman_process_observation
 
 
-class KalmanSensorBase(object):
+class KalmanSensorBase(abc.ABC):
     """
     Модель наблюдений в модели калмановской локализации.
     """
@@ -26,13 +26,15 @@ class KalmanSensorBase(object):
         return self._car_model._state_size
 
     @property
-    def observation_size(self):
+    @abc.abstractmethod
+    def observation_size(self) -> int:
         """Возвращает размер наблюдения"""
-        assert False, 'Not implemented'
+        ...
 
+    @abc.abstractmethod
     def get_observation_matrix(self):
         """Марица наблюдений С для фильтра Калмана"""
-        assert False, 'Not implemented'
+        ...
 
     def get_noise_covariance(self):
         """Диагональная матрица ковариации шума для фильтра Калмана"""

@@ -1,11 +1,10 @@
-# -*- coding: utf-8 -*-
 import numpy as np
 from matplotlib.patches import Ellipse, Rectangle
 
 from .car import Car
 
 
-class CarPlotter(object):
+class CarPlotter:
     def __init__(self, car_width=1, car_height=0.5,
                  real_color='g', obs_color='b', pred_color='r',
                  head_width=1):

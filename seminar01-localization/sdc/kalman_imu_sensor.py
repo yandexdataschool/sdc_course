@@ -1,10 +1,9 @@
-# -*- coding: utf-8 -*-
 import numpy as np
 from .kalman_sensor_base import KalmanSensorBase
 
 
 class KalmanImuSensor(KalmanSensorBase):
-    """Калмановский IMU-датчик."""
+    """Калмановский IMU-датчик"""
     def __init__(self, *args, **kwargs):
         super(KalmanImuSensor, self).__init__(*args, **kwargs)
 

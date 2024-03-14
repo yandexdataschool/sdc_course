@@ -1,9 +1,8 @@
-# -*- coding: utf-8 -*-
 import numpy as np
 from .timestamp import Timestamp
 
 
-class KalmanMovementModel(object):
+class KalmanMovementModel:
     """Модель эволюции в калмановской локализации.
     Продвигает автомобиль вперед с его текущей скоростью"""
     def __init__(self, noise_covariance_density=None):

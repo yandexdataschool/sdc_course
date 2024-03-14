@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 import numpy as np
 from .car import Car
 from .timestamp import Timestamp
@@ -56,7 +55,7 @@ class KalmanCar(Car):
         elif isinstance(sensor, KalmanImuSensor):
             self._imu_sensor = sensor
         else:
-            assert False, 'Unknown sensor type'
+            assert False, f'Unknown sensor type {type(sensor)}'
         self._sensors.append(sensor)
         sensor._initialize(self)
 

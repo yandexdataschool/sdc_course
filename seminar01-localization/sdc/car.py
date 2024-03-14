@@ -1,4 +1,4 @@
-# -*- coding: utf-8 -*-
+import typing as T
 import numpy as np
 from .timestamp import Timestamp
 from .movement_model_base import MovementModelBase
@@ -9,7 +9,7 @@ from .imu_sensor import ImuSensor
 from .sensor_landmark import LandmarkSensor
 
 
-class Car(object):
+class Car:
     """Простая модель автомобиля в двухмерном мире.
     В качестве истинных переменных состояния выступают положение, скорости и ориентация относительно оси oX:
     (pos_x, pos_y, vel, yaw)
@@ -26,12 +26,13 @@ class Car(object):
     VEL_INDEX = 3
     OMEGA_INDEX = 4
 
-    def __init__(self,
-                 initial_position=None,
-                 initial_velocity=None,
-                 initial_yaw=None,
-                 initial_omega=None,
-                 movement_model=None):
+    def __init__(
+            self,
+            initial_position=None,
+            initial_velocity=None,
+            initial_yaw=None,
+            initial_omega=None,
+            movement_model=None):
         """
         :param initial_position: list, tuple, np.ndarray with two elements (shape = (2,))
         :param initial_velocity: float
@@ -96,14 +97,16 @@ class Car(object):
                 self._position_x, self._position_y, self._yaw, self._velocity,
                 self._omega, self.time)
 
-    def set_movement_model(self, movement_model=None):
-        if movement_model is None:
-            movement_model = MovementModelBase()
-        assert isinstance(movement_model, MovementModelBase)
-        # Привязываем модель движения к автомобилю
-        self._movement_model = movement_model
-        # Привязываем автомобиль к модели движения
-        movement_model._initialize(self)
+    def set_movement_model(
+            self, movement_model: T.Optional[MovementModelBase]):
+        if movement_model is not None:
+            assert isinstance(movement_model, MovementModelBase)
+            # Привязываем модель движения к автомобилю
+            self._movement_model = movement_model
+            # Привязываем автомобиль к модели движения
+            movement_model._initialize(self)
+        else:
+            self._movement_model = None
 
     def add_sensor(self, sensor):
         assert isinstance(sensor, CarSensorBase)
@@ -116,7 +119,7 @@ class Car(object):
         elif isinstance(sensor, LandmarkSensor):
             self._landmark_sensors.append(sensor)
         else:
-            assert False, 'Unknown sensor type'
+            assert False, f'Unknown sensor type {type(sensor)}'
         self._sensors.append(sensor)
         sensor._initialize(self)
 

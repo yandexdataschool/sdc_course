@@ -1,10 +1,9 @@
-# -*- coding: utf-8 -*-
 import numpy as np
 from .car_sensor_base import CarSensorBase
 
 
 class GpsSensor(CarSensorBase):
-    """GPS-датчик. Измеряет глобальное положение автомобиля."""
+    """GPS-датчик. Измеряет глобальное положение автомобиля"""
     def __init__(self, *args, **kwargs):
         super(GpsSensor, self).__init__(*args, **kwargs)
 

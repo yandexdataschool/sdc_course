@@ -1,18 +1,16 @@
-# -*- coding: utf-8 -*-
+from __future__ import annotations
 
 
-class Timestamp(object):
+class Timestamp:
     """
     Special class designed to represent time in the model.
     Has too private members "_sec" and "_nsec" accessed via properties.
     """
     NANO_SEC_COEFF = 1000000000  # Number of nanoseconds in one second
     MICRO_SEC_COEFF = 1000000    # Number of microseconds in one second
-    MILLI_SEC_COEFF = 1000        # Number of milliseconds in one second
+    MILLI_SEC_COEFF = 1000       # Number of milliseconds in one second
 
-    def __init__(self, sec=0, nsec=0):
-        assert int(sec) == sec, 'sec must be an integer value'
-        assert int(nsec) == nsec, 'nsec must be an integer value'
+    def __init__(self, sec: int = 0, nsec: int = 0):
         self.sec = sec
         self.nsec = nsec
 
@@ -20,24 +18,25 @@ class Timestamp(object):
     #   Static methods for construction     #
     #########################################
     @staticmethod
-    def nanoseconds(nsec):
-        nsec = int(nsec)
+    def nanoseconds(nsec: int) -> Timestamp:
+        assert isinstance(nsec, int)
+        assert nsec >= 0
         sec = nsec // Timestamp.NANO_SEC_COEFF
         nsec -= sec * Timestamp.NANO_SEC_COEFF
         return Timestamp(sec, nsec)
 
     @staticmethod
-    def microseconds(mcs):
+    def microseconds(mcs: int) -> Timestamp:
         nsec = int(mcs * (Timestamp.NANO_SEC_COEFF / Timestamp.MICRO_SEC_COEFF))
         return Timestamp.nanoseconds(nsec)
 
     @staticmethod
-    def milliseconds(ms):
+    def milliseconds(ms: int) -> Timestamp:
         nsec = int(ms * (Timestamp.NANO_SEC_COEFF / Timestamp.MILLI_SEC_COEFF))
         return Timestamp.nanoseconds(nsec)
 
     @staticmethod
-    def seconds(sec):
+    def seconds(sec: int) -> Timestamp:
         nsec = int(sec * Timestamp.NANO_SEC_COEFF)
         return Timestamp.nanoseconds(nsec)
 
@@ -70,15 +69,15 @@ class Timestamp(object):
     #########################################
     #      Арифметрические операторы        #
     #########################################
-    def __add__(self, rhs):
+    def __add__(self, rhs) -> Timestamp:
         """a + b"""
         return Timestamp.nanoseconds(self.to_nanoseconds() + rhs.to_nanoseconds())
 
-    def __sub__(self, rhs):
+    def __sub__(self, rhs) -> Timestamp:
         """a - b"""
         return Timestamp.nanoseconds(self.to_nanoseconds() - rhs.to_nanoseconds())
 
-    def __iadd__(self, rhs):
+    def __iadd__(self, rhs) -> Timestamp:
         """a += b"""
         nsec = self.to_nanoseconds() + rhs.to_nanoseconds()
         self.sec = nsec // self.NANO_SEC_COEFF
@@ -89,56 +88,56 @@ class Timestamp(object):
     #      Свойства                         #
     #########################################
     @property
-    def sec(self):
+    def sec(self) -> int:
         return self._sec
 
     @property
-    def nsec(self):
+    def nsec(self) -> int:
         return self._nsec
 
     @sec.setter
-    def sec(self, sec):
-        assert sec == int(sec)
+    def sec(self, sec: int):
+        assert isinstance(sec, int), f'sec must be an integer value but got {type(sec)}'
         assert sec >= 0
-        self._sec = int(sec)
+        self._sec = sec
 
     @nsec.setter
-    def nsec(self, nsec):
-        assert nsec == int(nsec)
+    def nsec(self, nsec: int):
+        assert isinstance(nsec, int), f'nsec must be an integer value but got {type(nsec)}'
         assert nsec >= 0
         assert nsec < self.NANO_SEC_COEFF
-        self._nsec = int(nsec)
+        self._nsec = nsec
 
-    def to_seconds(self):
+    def to_seconds(self) -> float:
         """
         :rtype float:
         :returns: The number of seconds passed from the zero moment
         """
-        return self.sec + self.nsec / float(self.NANO_SEC_COEFF)
+        return float(self.sec) + self.nsec / float(10**9)
 
-    def to_milliseconds(self):
+    def to_milliseconds(self) -> float:
         """
         :rtype float:
         :returns: The number of milliseconds passed from the zero moment
         """
-        return self.to_seconds() * self.MILLI_SEC_COEFF
+        return float(self.sec * 10**3) + self.nsec / float(10**6)
 
-    def to_microseconds(self):
+    def to_microseconds(self) -> float:
         """
         :rtype float:
         :returns: The number of microseconds passed from the zero moment
         """
-        return self.to_seconds() * self.MICRO_SEC_COEFF
+        return float(self.sec * 10**6) + self.nsec / float(10**3)
 
-    def to_nanoseconds(self):
+    def to_nanoseconds(self) -> int:
         """
-        :rtype int:
+        :rtype float:
         :returns: The number of nanoseconds passed from the zero moment.
         """
-        return self.to_seconds() * self.NANO_SEC_COEFF
+        return self.sec * 10**9 + self.nsec
 
     def __str__(self):
-        return 'Time(sec={},nsec={})'.format(self.sec, self.nsec)
+        return f'Time(sec={self.sec},nsec={self.nsec})'
 
 
 if __name__ != '__main__':

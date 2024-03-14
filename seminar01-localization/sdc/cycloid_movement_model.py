@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 import numpy as np
 from .timestamp import Timestamp
 from .movement_model_base import MovementModelBase

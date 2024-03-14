@@ -1,9 +1,9 @@
-# -*- coding: utf-8 -*-
+import abc
 import numpy as np
 from .timestamp import Timestamp
 
 
-class CarSensorBase(object):
+class CarSensorBase(abc.ABC):
     """У сенсора есть реальный уровень шума, который он добавляет в наблюдения. Кроме того,
     есть уровень шума который предполагается нами и используется в фильтре Калмана.
     Сенсор запоминает последний момент времени выдачи показания. И если вдруг показание запрошено в тот же
@@ -23,10 +23,6 @@ class CarSensorBase(object):
 
         def _observe_clear(self):
             return np.array(...)
-
-        def _observe_clear(self):
-            assert False, 'Not implemented'
-
     """
     def __init__(self, noise_variances=None, random_state=None):
         # Даешь каждому сенсору свой генератор!
@@ -85,10 +81,12 @@ class CarSensorBase(object):
     #      Методы для переопределения       #
     #########################################
     @property
-    def observation_size(self):
+    @abc.abstractmethod
+    def observation_size(self) -> int:
         """Возвращает размер наблюдения"""
-        assert False, 'Not implemented'
+        ...
 
+    @abc.abstractmethod
     def _observe_clear(self):
         """Возвращает незашумленное значение наблюдения."""
-        assert False, 'Not implemented'
+        ...

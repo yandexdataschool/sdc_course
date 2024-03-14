@@ -1,7 +1,7 @@
-# -*- coding: utf-8 -*-
+import abc
 
 
-class MovementModelBase(object):
+class MovementModelBase(abc.ABC):
     """Отвечает за движение автомобиля. Представляет метод _move, который вызывается для продвижения
     автомобиля далее вдоль траектории на запрошенный шаг времени dt. Модель движения имеет прямой
     доступ к скрытому состоянию автомобиля для его корректного изменения.
@@ -24,8 +24,9 @@ class MovementModelBase(object):
     def state_size(self):
         return self._car._state_size
 
+    @abc.abstractmethod
     def _move(self,  dt):
         """Продвигает автомобиль вдоль его траектории на время dt. Увеличивает значение времени.
         Траектория может быть задана в явном виде, т.е. в виде уравнения движения.
         """
-        assert False
+        ...
