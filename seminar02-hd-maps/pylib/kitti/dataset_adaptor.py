@@ -65,5 +65,8 @@ class KittiDatasetAdaptor:
         assert lidar_cloud_idx < self.num_lidar_clouds
         return self._kitti_dataset.get_velo(lidar_cloud_idx)
 
+    def read_lidar_cloud_xyz(self, lidar_cloud_idx: int) -> np.ndarray:
+        return np.array(self.read_lidar_cloud_xyzi(lidar_cloud_idx)[:, :3])
+
     def read_lidar_clouds_xyzi(self) -> T.List[np.ndarray]:
         return list(self._kitti_dataset.velo)
