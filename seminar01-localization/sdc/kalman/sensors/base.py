@@ -1,6 +1,6 @@
 import abc
 import numpy as np
-from .kalman_filter import kalman_process_observation
+from sdc.kalman.filter import kalman_process_observation
 
 
 class KalmanSensorBase(abc.ABC):

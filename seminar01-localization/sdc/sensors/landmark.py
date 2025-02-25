@@ -1,5 +1,5 @@
 import numpy as np
-from .car_sensor_base import CarSensorBase
+from sdc.sensors.base import SensorBase
 
 
 def get_global_to_local_tranform_matrix(x, y, yaw):
@@ -40,7 +40,7 @@ def get_landmarks_position_in_local_frame(x, y, yaw, landmarks_xy):
     return np.dot(landmarks_xy, T_global2local[:2, :2].T) + T_global2local[:2, 0][None, :]
 
 
-class LandmarkSensor(CarSensorBase):
+class LandmarkSensor(SensorBase):
     def __init__(self, x, y, *args, **kwargs):
         """
         :param x: x-координата наблюдаемого объекта в глобальной системе координат
@@ -68,7 +68,7 @@ class LandmarkSensor(CarSensorBase):
             landmark_y=self._y)
 
 
-class LandmarksSensor(CarSensorBase):
+class LandmarksSensor(SensorBase):
     def __init__(self, landmarks_global_positions, *args, **kwargs):
         self._landmarks_global_positions = np.array(landmarks_global_positions)
         assert self._landmarks_global_positions.shape[1] == 2

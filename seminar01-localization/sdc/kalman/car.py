@@ -1,11 +1,11 @@
 import numpy as np
-from .car import Car
-from .timestamp import Timestamp
-from .kalman_movement_model import KalmanMovementModel
-from .kalman_can_sensor import KalmanCanSensor
-from .kalman_gps_sensor import KalmanGpsSensor
-from .kalman_imu_sensor import KalmanImuSensor
-from .kalman_filter import kalman_transit_covariance
+from sdc.car import Car
+from sdc.timestamp import Timestamp
+from sdc.kalman.movement_model import KalmanMovementModel
+from sdc.kalman.sensors.imu import KalmanImuSensor
+from sdc.kalman.sensors.gnss import KalmanGnssSensor
+from sdc.kalman.sensors.wheel_odometry import KalmanWheelOdometrySensor
+from sdc.kalman.filter import kalman_transit_covariance
 
 
 class KalmanCar(Car):
@@ -32,10 +32,10 @@ class KalmanCar(Car):
         self._positions_x.append(self._position_x)
         self._positions_y.append(self._position_y)
         self._yaws.append(self._yaw)
-        self._velocities.append(self._velocity)
-        self._velocities_x.append(self._velocity_x)
-        self._velocities_y.append(self._velocity_y)
-        self._omegas.append(self._omega)
+        self._linear_velocities.append(self._linear_velocity)
+        self._linear_velocities_x.append(self._linear_velocity_x)
+        self._linear_velocities_y.append(self._linear_velocity_y)
+        self._angular_velocities.append(self._angular_velocity)
 
     @property
     def covariance_matrix(self):
@@ -48,10 +48,10 @@ class KalmanCar(Car):
         self._covariance_matrix = covariance_matrix
 
     def add_sensor(self, sensor):
-        if isinstance(sensor, KalmanCanSensor):
-            self._can_sensor = sensor
-        elif isinstance(sensor, KalmanGpsSensor):
-            self._gps_sensor = sensor
+        if isinstance(sensor, KalmanWheelOdometrySensor):
+            self._wo_sensor = sensor
+        elif isinstance(sensor, KalmanGnssSensor):
+            self._gnss_sensor = sensor
         elif isinstance(sensor, KalmanImuSensor):
             self._imu_sensor = sensor
         else:
@@ -85,7 +85,7 @@ class KalmanCar(Car):
         self._positions_x.append(self._position_x)
         self._positions_y.append(self._position_y)
         self._yaws.append(self._yaw)
-        self._velocities.append(self._velocity)
-        self._velocities_x.append(self._velocity_x)
-        self._velocities_y.append(self._velocity_y)
-        self._omegas.append(self._omega)
+        self._linear_velocities.append(self._linear_velocity)
+        self._linear_velocities_x.append(self._linear_velocity_x)
+        self._linear_velocities_y.append(self._linear_velocity_y)
+        self._angular_velocities.append(self._angular_velocity)

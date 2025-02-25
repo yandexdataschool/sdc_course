@@ -1,13 +1,17 @@
 import numpy as np
 from matplotlib.patches import Ellipse, Rectangle
-
 from .car import Car
 
 
 class CarPlotter:
-    def __init__(self, car_width=1, car_height=0.5,
-                 real_color='g', obs_color='b', pred_color='r',
-                 head_width=1):
+    def __init__(
+            self,
+            car_width=1,
+            car_height=0.5,
+            real_color='g',
+            obs_color='b',
+            pred_color='r',
+            head_width=1):
         """
         :param car_width: Ширина автомобиля
         :param car_height: Длина автомобиля
@@ -28,8 +32,8 @@ class CarPlotter:
         self.head_width = head_width
 
     def plot_car(self, ax, car, marker_size=6):
-        """Отрисовывает положение автомобиля и покзания GPS и одометрии.
-        :param marker_size: Линейный размер точки положения и GPS-показания
+        """Отрисовывает положение автомобиля и покзания GNSS и одометрии.
+        :param marker_size: Линейный размер точки положения и GNSS-показания
         :param color: Цвет
         """
         assert isinstance(car, Car)
@@ -56,11 +60,11 @@ class CarPlotter:
         rec.set_edgecolor('k')
         ax.add_artist(rec)
 
-        # Если установлен GPS-датчик, то отрисовать показания GPS
-        if car.gps_sensor is not None:
-            gps_noise_covariance = car.gps_sensor.get_noise_covariance()
-            self._plot_ellipse(ax, car.gps_sensor.observe(), gps_noise_covariance, color=self.obs_color)
-            self._plot_point(ax, car.gps_sensor.observe(), marker='*',
+        # Если установлен GNSS-датчик, то отрисовать показания GNSS 
+        if car.gnss_sensor is not None:
+            gnss_noise_covariance = car.gnss_sensor.get_noise_covariance()
+            self._plot_ellipse(ax, car.gnss_sensor.observe(), gnss_noise_covariance, color=self.obs_color)
+            self._plot_point(ax, car.gnss_sensor.observe(), marker='*',
                              marker_color=self.obs_color, marker_size=marker_size)
 
     def plot_kalman_car(self, ax, kalman_car):

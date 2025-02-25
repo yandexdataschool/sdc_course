@@ -1,18 +1,18 @@
 import abc
 import numpy as np
-from .timestamp import Timestamp
+from sdc.timestamp import Timestamp
 
 
-class CarSensorBase(abc.ABC):
+class SensorBase(abc.ABC):
     """У сенсора есть реальный уровень шума, который он добавляет в наблюдения. Кроме того,
     есть уровень шума который предполагается нами и используется в фильтре Калмана.
     Сенсор запоминает последний момент времени выдачи показания. И если вдруг показание запрошено в тот же
     момент модельного времени еще раз, то возвращается то же самое показания (Логично? Логично!)
 
-    Для создания сенсора на основе класса CarSensorBase достаточно создать новый класс
-    по следующему шаблону (примеры: CarSensor, ImuSensor, GpsSensor):
+    Для создания сенсора на основе класса SensorBase достаточно создать новый класс
+    по следующему шаблону (примеры: WheelOdometrySensor, ImuSensor, GnssSensor):
 
-        class NewSensor(CarSensorBase):
+        class NewSensor(SensorBase):
             def __init__(self, ...):
                 super(NewSensor, self).__init__()
                 ...

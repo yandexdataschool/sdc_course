@@ -1,5 +1,5 @@
 import numpy as np
-from .timestamp import Timestamp
+from sdc.timestamp import Timestamp
 
 
 class KalmanMovementModel:
@@ -39,18 +39,18 @@ class KalmanMovementModel:
         state = car.state
         assert state.shape[0] == state_size
         dt_sec = dt.to_seconds()
-        x = state[car.POS_X_INDEX]
-        y = state[car.POS_Y_INDEX]
-        yaw = state[car.YAW_INDEX]
-        vel = state[car.VEL_INDEX]
-        omega = state[car.OMEGA_INDEX]
+        x = state[car.POSITION_X_IDX]
+        y = state[car.POSITION_Y_IDX]
+        yaw = state[car.YAW_IDX]
+        linear_velocity = state[car.LINEAR_VELOCITY_IDX]
+        angular_velocity = state[car.ANGULAR_VELOCITY_IDX]
 
         new_state = np.zeros_like(state)
-        new_state[car.POS_X_INDEX] = x + vel * np.cos(yaw) * dt_sec
-        new_state[car.POS_Y_INDEX] = y + vel * np.sin(yaw) * dt_sec
-        new_state[car.YAW_INDEX] = yaw + omega * dt_sec
-        new_state[car.VEL_INDEX] = vel
-        new_state[car.OMEGA_INDEX] = omega
+        new_state[car.POSITION_X_IDX] = x + linear_velocity * np.cos(yaw) * dt_sec
+        new_state[car.POSITION_Y_IDX] = y + linear_velocity * np.sin(yaw) * dt_sec
+        new_state[car.YAW_IDX] = yaw + angular_velocity * dt_sec
+        new_state[car.LINEAR_VELOCITY_IDX] = linear_velocity
+        new_state[car.ANGULAR_VELOCITY_IDX] = angular_velocity
         return new_state
 
     def get_state_jacobian_matrix(self, dt):
@@ -63,14 +63,14 @@ class KalmanMovementModel:
         assert state.shape[0] == state_size
 
         dt_sec = dt.to_seconds()
-        vel = state[car.VEL_INDEX]
-        yaw = state[car.YAW_INDEX]
+        linear_velocity = state[car.LINEAR_VELOCITY_IDX]
+        yaw = state[car.YAW_IDX]
         J = np.eye(state_size, dtype=np.float64)
-        J[car.POS_X_INDEX, car.VEL_INDEX] = np.cos(yaw) * dt_sec
-        J[car.POS_Y_INDEX, car.VEL_INDEX] = np.sin(yaw) * dt_sec
-        J[car.POS_X_INDEX, car.YAW_INDEX] = -vel * np.sin(yaw) * dt_sec
-        J[car.POS_Y_INDEX, car.YAW_INDEX] = vel * np.cos(yaw) * dt_sec
-        J[car.YAW_INDEX, car.OMEGA_INDEX] = dt_sec
+        J[car.POSITION_X_IDX, car.LINEAR_VELOCITY_IDX] = np.cos(yaw) * dt_sec
+        J[car.POSITION_Y_IDX, car.LINEAR_VELOCITY_IDX] = np.sin(yaw) * dt_sec
+        J[car.POSITION_X_IDX, car.YAW_IDX] = -linear_velocity * np.sin(yaw) * dt_sec
+        J[car.POSITION_Y_IDX, car.YAW_IDX] = linear_velocity * np.cos(yaw) * dt_sec
+        J[car.YAW_IDX, car.ANGULAR_VELOCITY_IDX] = dt_sec
         return J
 
     def get_noise_covariance(self, dt):

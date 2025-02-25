@@ -1,18 +1,18 @@
 import numpy as np
-from .timestamp import Timestamp
-from .movement_model_base import MovementModelBase
+from sdc.timestamp import Timestamp
+from sdc.movement_models.base import MovementModelBase
 
 
 class CircleMovementModel(MovementModelBase):
     """Реализует движение автомобиля по циклоиде"""
     def __init__(self, *args, **kwargs):
-        super(CircleMovementModel, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
         self._radius = None
-        self._omega = None
-        self._velocity = None
+        self._angular_velocity = None
+        self._linear_velocity = None
 
     def _initialize(self, car):
-        super(CircleMovementModel, self)._initialize(car)
+        super()._initialize(car)
         # Определение парметров траектории (x_c, y_c, t_0) из начального сотояния робота
         # x(t) = x_c + r * cos(w(t - t_0))
         # y(t) = y_c + r * sin(w(t - t_0))

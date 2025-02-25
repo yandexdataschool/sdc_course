@@ -1,12 +1,9 @@
 import numpy as np
-from .car_sensor_base import CarSensorBase
+from sdc.sensors.base import SensorBase
 
 
-class ImuSensor(CarSensorBase):
-    """IMU-датчик. Измеряет угловую скорость автомобиля"""
-    def __init__(self, *args, **kwargs):
-        super(ImuSensor, self).__init__(*args, **kwargs)
-
+class ImuSensor(SensorBase):
+    """IMU sensor. Measures vehicle angular velocity"""
     def __str__(self):
         return 'IMU'
 
@@ -15,7 +12,7 @@ class ImuSensor(CarSensorBase):
         return 1
 
     def _observe_clear(self):
-        return np.array([self._car._omega])
+        return np.array([self._car._angular_velocity])
 
 
 if __name__ != '__main__':
