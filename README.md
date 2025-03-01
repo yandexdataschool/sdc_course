@@ -1,2 +1,2 @@
 # sdc_course
-Short course about self-driving cars
+Not so short course about self-driving cars
