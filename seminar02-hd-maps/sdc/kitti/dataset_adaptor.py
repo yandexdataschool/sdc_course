@@ -4,7 +4,7 @@ import pykitti
 from ..transforms.rotation_rpy import RotationRPY
 from ..geo.geo_position_lla import GeoPositionLLA
 from ..geo.geo_position_xyz import GeoPositionXYZ
-from pylib.geo.geo_lla_xyz_converter import GeoLlaXyzConverter
+from ..geo.geo_lla_xyz_converter import GeoLlaXyzConverter
 from .localization import Localization, build_localizations
 
 
