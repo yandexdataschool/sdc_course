@@ -13,5 +13,5 @@ tqdm
 absl-py
 wandb
 transformers
-tensorflow==2.10.0
+tensorflow==2.11.1
 seaborn
