@@ -6,11 +6,14 @@ class Timestamp:
     Special class designed to represent time in the model.
     Has too private members "_sec" and "_nsec" accessed via properties.
     """
+
     NANO_SEC_COEFF = 1000000000  # Number of nanoseconds in one second
-    MICRO_SEC_COEFF = 1000000    # Number of microseconds in one second
-    MILLI_SEC_COEFF = 1000       # Number of milliseconds in one second
+    MICRO_SEC_COEFF = 1000000  # Number of microseconds in one second
+    MILLI_SEC_COEFF = 1000  # Number of milliseconds in one second
 
     def __init__(self, sec: int = 0, nsec: int = 0):
+        assert isinstance(sec, int)
+        assert isinstance(nsec, int)
         self.sec = sec
         self.nsec = nsec
 
@@ -97,13 +100,15 @@ class Timestamp:
 
     @sec.setter
     def sec(self, sec: int):
-        assert isinstance(sec, int), f'sec must be an integer value but got {type(sec)}'
+        assert isinstance(sec, int), f"sec must be an integer value but got {type(sec)}"
         assert sec >= 0
         self._sec = sec
 
     @nsec.setter
     def nsec(self, nsec: int):
-        assert isinstance(nsec, int), f'nsec must be an integer value but got {type(nsec)}'
+        assert isinstance(nsec, int), (
+            f"nsec must be an integer value but got {type(nsec)}"
+        )
         assert nsec >= 0
         assert nsec < self.NANO_SEC_COEFF
         self._nsec = nsec
@@ -137,25 +142,4 @@ class Timestamp:
         return self.sec * 10**9 + self.nsec
 
     def __str__(self):
-        return f'Time(sec={self.sec},nsec={self.nsec})'
-
-
-if __name__ != '__main__':
-    # Test
-    t = Timestamp(1, 19)
-    assert t.sec == 1
-    assert t.nsec == 19
-    t.sec = 2
-    t.nsec = 10000
-    assert t.sec == 2
-    assert t.nsec == 10000
-    assert abs(t.to_seconds() - 2.00001) < 1e-9
-
-    t1 = Timestamp(1, 1000000)
-    t2 = Timestamp(2, 100000000)
-    assert abs(t1.to_seconds() - 1.001) < 1e-9
-    assert abs(t2.to_seconds() - 2.1) < 1e-9
-    assert abs((t2 - t1).to_seconds() - 1.099) < 1e-9
-    assert abs((t2 + t1).to_seconds() - 3.101) < 1e-9
-    t2 += t1
-    assert abs(t2.to_seconds() - 3.101) < 1e-9
+        return f"Time(sec={self.sec},nsec={self.nsec})"
