@@ -1,5 +1,7 @@
 import numpy as np
+from sdc.msgs import GnssPositionMessage
 from sdc.sensors.base import SensorBase
+from sdc.sensors.utils import get_sensor_global_position
 
 
 class GnssSensor(SensorBase):
@@ -11,11 +13,9 @@ class GnssSensor(SensorBase):
     def observation_size(self):
         return 2
 
-    def _observe_clear(self):
-        return np.array([self._car._position_x, self._car._position_y])
+    def _observe_clear(self) -> np.ndarray:
+        return get_sensor_global_position(self)
 
-
-if __name__ != '__main__':
-    sensor = GnssSensor(noise_variances=[15, 15])
-    assert sensor.observation_size == 2
-    assert np.all(sensor.get_noise_covariance() == np.diag([15, 15]))
+    def _generate_message(self) -> GnssPositionMessage:
+        observation_x, observation_y = self.observe()
+        return GnssPositionMessage(self.time, observation_x, observation_y)

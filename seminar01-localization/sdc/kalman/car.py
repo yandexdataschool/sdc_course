@@ -1,6 +1,6 @@
 import numpy as np
 from sdc.car import Car
-from sdc.timestamp import Timestamp
+from sdc.core.timestamp import Timestamp
 from sdc.kalman.movement_model import KalmanMovementModel
 from sdc.kalman.sensors.imu import KalmanImuSensor
 from sdc.kalman.sensors.gnss import KalmanGnssSensor

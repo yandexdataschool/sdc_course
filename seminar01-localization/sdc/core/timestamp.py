@@ -1,4 +1,5 @@
 from __future__ import annotations
+import typing as T
 
 
 class Timestamp:
@@ -21,7 +22,7 @@ class Timestamp:
     #   Static methods for construction     #
     #########################################
     @staticmethod
-    def nanoseconds(nsec: int) -> Timestamp:
+    def from_nanoseconds(nsec: int) -> Timestamp:
         assert isinstance(nsec, int)
         assert nsec >= 0
         sec = nsec // Timestamp.NANO_SEC_COEFF
@@ -29,25 +30,25 @@ class Timestamp:
         return Timestamp(sec, nsec)
 
     @staticmethod
-    def microseconds(mcs: int) -> Timestamp:
+    def from_microseconds(mcs: int) -> Timestamp:
         nsec = int(mcs * (Timestamp.NANO_SEC_COEFF / Timestamp.MICRO_SEC_COEFF))
-        return Timestamp.nanoseconds(nsec)
+        return Timestamp.from_nanoseconds(nsec)
 
     @staticmethod
-    def milliseconds(ms: int) -> Timestamp:
+    def from_milliseconds(ms: int) -> Timestamp:
         nsec = int(ms * (Timestamp.NANO_SEC_COEFF / Timestamp.MILLI_SEC_COEFF))
-        return Timestamp.nanoseconds(nsec)
+        return Timestamp.from_nanoseconds(nsec)
 
     @staticmethod
-    def seconds(sec: int) -> Timestamp:
+    def from_seconds(sec: T.Union[int, float]) -> Timestamp:
         nsec = int(sec * Timestamp.NANO_SEC_COEFF)
-        return Timestamp.nanoseconds(nsec)
+        return Timestamp.from_nanoseconds(nsec)
 
     #########################################
     #      Assignments operators            #
     #########################################
     def __le__(self, rhs):
-        if self.sec <= rhs.sec:
+        if self.sec < rhs.sec:
             return True
         if self.sec == rhs.sec:
             return self.nsec <= rhs.nsec
@@ -74,11 +75,11 @@ class Timestamp:
     #########################################
     def __add__(self, rhs) -> Timestamp:
         """a + b"""
-        return Timestamp.nanoseconds(self.to_nanoseconds() + rhs.to_nanoseconds())
+        return Timestamp.from_nanoseconds(self.to_nanoseconds() + rhs.to_nanoseconds())
 
     def __sub__(self, rhs) -> Timestamp:
         """a - b"""
-        return Timestamp.nanoseconds(self.to_nanoseconds() - rhs.to_nanoseconds())
+        return Timestamp.from_nanoseconds(self.to_nanoseconds() - rhs.to_nanoseconds())
 
     def __iadd__(self, rhs) -> Timestamp:
         """a += b"""

@@ -1,5 +1,5 @@
 import numpy as np
-from sdc.timestamp import Timestamp
+from sdc.core.timestamp import Timestamp
 
 
 class KalmanMovementModel:
