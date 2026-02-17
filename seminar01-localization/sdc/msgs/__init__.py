@@ -20,3 +20,15 @@ class GnssPositionMessage(MessageBase):
         super().__init__(stamp)
         self.x = x
         self.y = y
+
+
+class WheelOdometryMessage(MessageBase):
+    def __init__(self, stamp: Timestamp, linear_velocity: float):
+        super().__init__(stamp)
+        self.linear_velocity = linear_velocity
+
+
+class ImuMessage(MessageBase):
+    def __init__(self, stamp: Timestamp, angular_velocity: float):
+        super().__init__(stamp)
+        self.angular_velocity = angular_velocity

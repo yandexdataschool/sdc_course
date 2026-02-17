@@ -17,14 +17,14 @@ class KalmanMovementModel:
 
     @property
     def state_size(self):
-        return self._car_model._state_size
+        return self._car_model.state_size
 
-    def _initialize(self, car_model):
+    def _attach(self, car_model):
         """Вызывается при добавлении модели движения к автомобилю.
         Привязывает модель к конкретному автомобилю.
         """
         self._car_model = car_model
-        state_size = car_model._state_size
+        state_size = car_model.state_size
         if self._noise_covariance_density is None:
             self._noise_covariance_density = np.zeros((state_size, state_size), dtype=np.float64)
         else:
@@ -58,7 +58,7 @@ class KalmanMovementModel:
         собой матрицу перехода A для текущего момента времени car.time."""
         assert isinstance(dt, Timestamp)
         car = self._car_model
-        state_size = car._state_size
+        state_size = car.state_size
         state = car.state
         assert state.shape[0] == state_size
 

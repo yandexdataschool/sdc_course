@@ -5,8 +5,8 @@ import typing as T
 from sdc.core.timestamp import Timestamp
 from sdc.sim.component import SimulationComponent
 from sdc.sim.pipeline import Pipeline
+from sdc.sim.sensors.base import SensorBase
 from sdc.movement_models.base import MovementModelBase
-from sdc.sensors.base import SensorBase
 
 
 class RobotStateBase(abc.ABC):
@@ -37,21 +37,22 @@ class RobotBase(SimulationComponent):
         self._sensor_pose_by_id: T.Dict[str, np.ndarray] = dict()
 
     @property
-    @abc.abstractmethod
     def state(self) -> RobotStateBase:
-        return ...
+        return self._state
 
     @property
     def movement_model(self) -> T.Optional[MovementModelBase]:
         return self._movement_model
 
-    @movement_model.setter
-    def movement_model(self, movement_model: T.Optional[MovementModelBase]):
+    def set_movement_model(self, movement_model: T.Optional[MovementModelBase]):
+        """
+        :param movement_model: MovementModelBase or None. Represents the real movement trajectory
+        """
         # Attaching movement plan/trajectory to simulated robot
         if movement_model is not None:
             assert isinstance(movement_model, MovementModelBase)
             self._movement_model = movement_model
-            movement_model._initialize(self)
+            movement_model._attach(self)
         else:
             self._movement_model = None
 
@@ -59,16 +60,19 @@ class RobotBase(SimulationComponent):
     def pipeline(self) -> T.Optional[Pipeline]:
         return self._pipeline
 
-    @pipeline.setter
-    def pipeline(self, pipeline: T.Optional[Pipeline]):
+    def set_pipeline(self, pipeline: T.Optional[Pipeline]):
         self._pipeline = pipeline
 
     def add_sensor(self, sensor: SensorBase, sensor_pose: np.ndarray):
         assert isinstance(sensor, SensorBase)
-        assert sensor.id not in self._sensor_by_id
+        assert sensor.id not in self._sensor_by_id, f'Sensor with ID "{sensor.id}" already present'
         self._sensor_by_id[sensor.id] = sensor
         self._sensor_pose_by_id[sensor.id] = sensor_pose
         sensor._mount(self)
+
+        if self._time is not None:
+            # Connecting sensor on-the-fly
+            sensor.set_time(self._time)
 
     def get_sensor(self, sensor_id: str) -> SensorBase:
         return self._sensor_by_id[sensor_id]
@@ -78,10 +82,13 @@ class RobotBase(SimulationComponent):
 
     def get_sensors_by_type(self, sensor_type: type) -> T.List[SensorBase]:
         sensors = []
-        for sensor_id, sensor in self._sensors_by_id.items():
+        for sensor in self._sensor_by_id.values():
             if isinstance(sensor, sensor_type):
                 sensors.append(sensor)
         return sensors
+
+    def get_sensors(self) -> T.List[SensorBase]:
+        return list(self._sensor_by_id.values())
 
     @property
     def time(self):
@@ -102,7 +109,7 @@ class RobotBase(SimulationComponent):
     def _move_by_impl(self, dt: Timestamp):
         # Moving robot in simulated scene
         if self._movement_model is not None:
-            self._movement_model._move_by(dt)
+            self._movement_model.move_by(dt)
 
         # Generating sensors measurements
         for sensor in self._sensor_by_id.values():

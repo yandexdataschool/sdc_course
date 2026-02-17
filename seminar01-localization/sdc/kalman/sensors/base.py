@@ -7,23 +7,25 @@ class KalmanSensorBase(abc.ABC):
     """
     Модель наблюдений в модели калмановской локализации.
     """
-    def __init__(self,  noise_variances=None):
+    def __init__(self, sensor_id: str, noise_variances: np.ndarray):
         """
         :param noise_covariance: Ожидаемые значения дисперсии наблюдений (уровень шума).
         """
-        if noise_variances is None:
-            self._noise_variances = np.zeros(self.observation_size, dtype=np.float64)
-        else:
-            self._noise_variances = np.array(noise_variances)
-            assert self._noise_variances.shape == (self.observation_size,)
+        self._sensor_id = sensor_id
+        self._noise_variances = np.array(noise_variances)
+        assert self._noise_variances.shape == (self.observation_size,)
 
-    def _initialize(self, car_model):
-        """Вызывается в момент добавления сенсора в машину"""
-        self._car_model = car_model
+    def _mount(self, robot_model):
+        """This method is called when sensor model is added to robot model"""
+        self._robot_model = robot_model
+
+    @property
+    def id(self) -> str:
+        return self._sensor_id
 
     @property
     def state_size(self):
-        return self._car_model._state_size
+        return self._robot_model.state_size
 
     @property
     @abc.abstractmethod
@@ -43,8 +45,8 @@ class KalmanSensorBase(abc.ABC):
     def process_observation(self, observation):
         C = self.get_observation_matrix()
         Q = self.get_noise_covariance()
-        mu = self._car_model.state
-        S = self._car_model.covariance_matrix
+        mu = self._robot_model.state
+        S = self._robot_model.covariance_matrix
         new_mu, new_S = kalman_process_observation(mu, S, observation, C, Q)
-        self._car_model.state = new_mu
-        self._car_model.covariance_matrix = new_S
+        self._robot_model.state = new_mu
+        self._robot_model.covariance_matrix = new_S

@@ -1,5 +1,5 @@
 import numpy as np
-from sdc.sensors.base import SensorBase
+from .base import SensorBase
 
 
 def get_global_to_local_tranform_matrix(x, y, yaw):

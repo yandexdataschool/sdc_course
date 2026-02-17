@@ -16,15 +16,16 @@ class CycloidMovementModel(MovementModelBase):
         self.y_vel = y_vel
         self.angular_velocity = angular_velocity
 
-    def _move(self, dt):
+    def _move_by_impl(self, dt: Timestamp):
         assert isinstance(dt, Timestamp)
-        car = self._car
+        assert self._time == self._robot.time
+
         dt_sec = dt.to_seconds()
 
-        x = car._position_x
-        y = car._position_y
-        vel = car._linear_velocity
-        yaw = car._yaw
+        x = self._robot.state.position_x
+        y = self._robot.state.position_y
+        vel = self._robot.state.linear_velocity
+        yaw = self._robot.state.yaw
 
         vel_x = vel * np.cos(yaw)
         vel_y = vel * np.sin(yaw)
@@ -35,8 +36,9 @@ class CycloidMovementModel(MovementModelBase):
         new_vel_y = vel_y + self.angular_velocity * (vel_x - self.x_vel) * dt_sec
 
         # Продвигаем время, выставляем новое состояние
-        car.time += dt
-        car._position_x = new_x
-        car._position_y = new_y
-        car._linear_velocity = np.sqrt(new_vel_x**2 + new_vel_y**2)
-        car._yaw = np.arctan2(new_vel_y, new_vel_x)
+        self._robot.state.position_x = new_x
+        self._robot.state.position_y = new_y
+        self._robot.state.linear_velocity = np.sqrt(new_vel_x**2 + new_vel_y**2)
+        self._robot.state.yaw = np.arctan2(new_vel_y, new_vel_x)
+
+        self._time += dt

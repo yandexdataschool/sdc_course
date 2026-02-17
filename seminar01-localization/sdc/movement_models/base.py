@@ -1,10 +1,12 @@
-import abc
+import copy
+from sdc.core.timestamp import Timestamp
+from sdc.sim.component import SimulationComponent
 
 
-class MovementModelBase(abc.ABC):
+class MovementModelBase(SimulationComponent):
     """Отвечает за движение автомобиля. Представляет метод _move, который вызывается для продвижения
     автомобиля далее вдоль траектории на запрошенный шаг времени dt. Модель движения имеет прямой
-    доступ к скрытому состоянию автомобиля для его корректного изменения.
+    доступ к скрытому состоянию автомобиля для его корректного изменения
 
     Калмановская локализация:
         Реализует модель эволюции.
@@ -12,21 +14,12 @@ class MovementModelBase(abc.ABC):
     """
 
     def __init__(self):
-        self._car = None
+        super().__init__()
+        self._robot = None
 
-    def _initialize(self, car):
-        """Вызывается при добавлении модели движения к автомобилю.
-        Привязывает модель к конкретному автомобилю.
-        """
-        self._car = car
+    def _attach(self, robot):
+        """This method is called automatically when trajecotry/movement model is attached to robot"""
+        self._robot = robot
 
-    @property
-    def state_size(self):
-        return self._car._state_size
-
-    @abc.abstractmethod
-    def _move(self,  dt):
-        """Продвигает автомобиль вдоль его траектории на время dt. Увеличивает значение времени.
-        Траектория может быть задана в явном виде, т.е. в виде уравнения движения.
-        """
-        ...
+    def _set_time_impl(self, time: Timestamp):
+        self._time = copy.deepcopy(time)

@@ -1,5 +1,5 @@
 from sdc.sim.sensors.base import SensorBase
-from sdc.sensors.utils import get_sensor_global_position
+from sdc.sim.sensors.utils import get_sensor_global_position
 
 
 class SensorVisualizer:

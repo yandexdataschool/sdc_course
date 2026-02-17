@@ -1,7 +1,7 @@
 import numpy as np
 from sdc.msgs import GnssPositionMessage
-from sdc.sensors.base import SensorBase
-from sdc.sensors.utils import get_sensor_global_position
+from .base import SensorBase
+from .utils import get_sensor_global_position
 
 
 class GnssSensor(SensorBase):

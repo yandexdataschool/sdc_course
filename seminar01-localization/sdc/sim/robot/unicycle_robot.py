@@ -64,7 +64,3 @@ class UnicycleRobotV1(RobotBase):
     @property
     def params(self) -> UnicycleRobotParameters:
         return self._params
-
-    @property
-    def state(self) -> UnicycleRobotV1State:
-        return self._state
