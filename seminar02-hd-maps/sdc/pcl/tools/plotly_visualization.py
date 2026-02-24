@@ -49,7 +49,7 @@ def plot_cloud(
 
 def apply_min_max_scaling(values, min_value=0., max_value=1.):
     assert min_value < max_value
-    values = np.array(values, copy=False, dtype=np.float64)
+    values = np.array(values, copy=True, dtype=np.float64)
     values = (values - np.min(values)) / (np.max(values) - np.min(values))
     values = min_value + (max_value - min_value) * values
     return values
