@@ -27,13 +27,6 @@ def convert_xyz_and_rpy_to_transform_matrix(
     return transform_matrix
 
 
-def verify_transform_matrix(transform_matrix):
-    assert isinstance(transform_matrix, np.ndarray)
-    assert transform_matrix.shape == (4, 4)
-    assert transform_matrix.dtype == np.float64
-    assert np.all(transform_matrix[3, :] == np.array([0., 0., 0., 1.], dtype=np.float64))
-
-
 def convert_rotation_matrix_to_quaternion(rotation_matrix: np.ndarray):
     assert rotation_matrix.shape == (3, 3)
     assert rotation_matrix.dtype == np.float64
@@ -41,7 +34,7 @@ def convert_rotation_matrix_to_quaternion(rotation_matrix: np.ndarray):
 
 
 def convert_quaternion_to_rotation_matrix(quaternion: T.Union[T.List[float], np.ndarray]):
-    quaternion = np.array(quaternion, copy=False)
+    quaternion = np.array(quaternion)
     assert quaternion.shape == (4,)
     assert quaternion.dtype == np.float64
     return Rotation.from_quat(quaternion).as_matrix()
